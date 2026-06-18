@@ -22,7 +22,11 @@ class InputSanitizer
 
     public static function allowedTags(string $html): string
     {
-        // Strip all tags except safe ones
-        return strip_tags($html, '<p><a><strong><em><ul><ol><li><h2><h3><h4><br><img><table><tr><td><th>');
+        // Strip unsafe tags and remove common dangerous attributes/protocols.
+        $html = strip_tags($html, '<p><a><strong><em><ul><ol><li><h2><h3><h4><br><img><table><tr><td><th>');
+        $html = preg_replace('/\s+on[a-z]+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $html) ?? '';
+        $html = preg_replace('/\s+(href|src)\s*=\s*("|\')\s*javascript:[^"\']*("|\')/i', '', $html) ?? '';
+        $html = preg_replace('/\s+(href|src)\s*=\s*javascript:[^\s>]*/i', '', $html) ?? '';
+        return $html;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Core;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\TenantMiddleware;
 use App\Middleware\AdminMiddleware;
+use App\Database\Migrations;
 use App\Security\Csrf;
 use App\Security\RateLimit;
 
@@ -35,6 +36,10 @@ class App
             if (empty($_SESSION['csrf_token'])) {
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             }
+        }
+
+        if (Config::get('database.auto_migrate', true)) {
+            (new Migrations())->run();
         }
 
         // Load routes
