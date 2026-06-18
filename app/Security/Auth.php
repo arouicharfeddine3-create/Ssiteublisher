@@ -1,8 +1,9 @@
 <?php
 namespace App\Security;
 
-use App\Core\Database;
 use App\Core\Config;
+use App\Core\Database;
+use App\Core\Logger;
 
 class Auth
 {
@@ -37,11 +38,19 @@ class Auth
 
     public static function user(): ?array
     {
-        if (self::$user !== null) return self::$user;
+        if (self::$user !== null) {
+            return self::$user;
+        }
         if (isset($_SESSION['user_id'])) {
             $db = Database::getInstance();
-            self::$user = $db->query("SELECT id, name, email, role, site_id FROM users WHERE id = ?", [$_SESSION['user_id']])->fetch();
-            return self::$user;
+            $row = $db->query(
+                "SELECT id, name, email, role, site_id FROM users WHERE id = ?",
+                [$_SESSION['user_id']]
+            )->fetch();
+            if (is_array($row)) {
+                self::$user = $row;
+                return self::$user;
+            }
         }
         return null;
     }
@@ -63,7 +72,9 @@ class Auth
 
     public static function logout(): void
     {
-        session_destroy();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+        }
         self::$user = null;
     }
 }
