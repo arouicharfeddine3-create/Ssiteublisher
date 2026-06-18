@@ -1,5 +1,5 @@
 <?php
-$router = (new \App\Core\App())->getRouter();
+$router = \App\Core\App::getInstance()->getRouter();
 
 $router->group('/admin', function($router) {
     // Admin-only routes

@@ -4,7 +4,7 @@ use App\Modules\Dashboard\DashboardController;
 use App\Modules\Articles\ArticleController;
 use App\Modules\Auth\AuthController;
 
-$router = (new \App\Core\App())->getRouter();
+$router = \App\Core\App::getInstance()->getRouter();
 
 $router->get('/', [DashboardController::class, 'index']);
 $router->get('/dashboard', [DashboardController::class, 'index']);

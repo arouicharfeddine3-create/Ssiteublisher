@@ -54,7 +54,7 @@ class Router
     private function convertToRegex(string $uri): string
     {
         $pattern = preg_quote($uri, '/');
-        $pattern = str_replace('\{id\}', '([^/]+)', $pattern);
+        $pattern = str_replace('\{id\}', '([^\/]+)', $pattern);
         $pattern = str_replace('\{slug\}', '([a-zA-Z0-9\-]+)', $pattern);
         return '/^' . $pattern . '$/';
     }
@@ -64,6 +64,12 @@ class Router
         $uri = parse_url($uri, PHP_URL_PATH);
         $uri = rtrim($uri, '/') ?: '/';
         $method = strtoupper($method);
+        if ($method === 'POST') {
+            $override = strtoupper((string) ($_POST['_method'] ?? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? ''));
+            if (in_array($override, ['PUT', 'PATCH', 'DELETE'], true)) {
+                $method = $override;
+            }
+        }
 
         foreach ($this->routes as $route) {
             if ($route['method'] !== $method && $route['method'] !== 'ANY') continue;

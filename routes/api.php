@@ -1,5 +1,5 @@
 <?php
-$router = (new \App\Core\App())->getRouter();
+$router = \App\Core\App::getInstance()->getRouter();
 
 $router->group('/api', function($router) {
     $router->get('/stats', [\App\Modules\Dashboard\DashboardController::class, 'apiStats']);
