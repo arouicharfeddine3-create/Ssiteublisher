@@ -24,7 +24,14 @@ abstract class Controller
 
     protected function request(): array
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $rawInput = file_get_contents('php://input');
+        $input = [];
+
+        if (is_string($rawInput) && $rawInput !== '') {
+            $decoded = json_decode($rawInput, true);
+            $input = is_array($decoded) ? $decoded : [];
+        }
+
         return array_merge($_GET, $_POST, $input);
     }
 
@@ -36,11 +43,14 @@ abstract class Controller
         foreach ($rules as $field => $rule) {
             $value = $data[$field] ?? null;
             // Required
-            if (str_contains($rule, 'required') && empty($value)) {
+            $ruleParts = explode('|', $rule);
+            $isEmpty = $value === null || $value === '';
+            if (in_array('required', $ruleParts, true) && $isEmpty) {
                 $errors[$field] = "$field is required.";
+                continue;
             }
             // Email
-            if (str_contains($rule, 'email') && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+            if (!$isEmpty && in_array('email', $ruleParts, true) && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
                 $errors[$field] = "$field must be a valid email.";
             }
             // etc.

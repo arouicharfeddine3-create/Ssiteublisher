@@ -23,6 +23,7 @@ class Csrf
 
     public static function field(): string
     {
-        return '<input type="hidden" name="_token" value="' . self::getToken() . '">';
+        $token = htmlspecialchars(self::getToken(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        return '<input type="hidden" name="_token" value="' . $token . '">';
     }
 }

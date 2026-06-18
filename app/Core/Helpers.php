@@ -6,7 +6,8 @@ class Helpers
     public static function slugify(string $text): string
     {
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
-        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $transliterated = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = $transliterated === false ? $text : $transliterated;
         $text = preg_replace('~[^-\w]+~', '', $text);
         $text = trim($text, '-');
         $text = preg_replace('~-+~', '-', $text);
@@ -19,17 +20,23 @@ class Helpers
         if (mb_strlen($stripped) <= $limit) {
             return $stripped;
         }
-        return mb_substr($stripped, 0, $limit) . '...';
+        return rtrim(mb_substr($stripped, 0, max(0, $limit))) . '...';
     }
 
     public static function randomString(int $length = 16): string
     {
-        return bin2hex(random_bytes($length / 2));
+        if ($length < 1) {
+            throw new \InvalidArgumentException('Random string length must be at least 1 byte.');
+        }
+
+        return bin2hex(random_bytes($length));
     }
 
     public static function sanitizeFileName(string $name): string
     {
-        return preg_replace('/[^a-zA-Z0-9\-_.]/', '', str_replace(' ', '_', $name));
+        $name = str_replace(' ', '_', basename($name));
+        $name = preg_replace('/[^a-zA-Z0-9\-_.]/', '', $name) ?? '';
+        return ltrim($name, '.') ?: 'file';
     }
 
     public static function formatBytes(int $bytes, int $precision = 2): string
