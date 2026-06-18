@@ -89,3 +89,14 @@ CREATE TABLE IF NOT EXISTS `knowledge_base` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `keyword` (`keyword`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `ai_requests` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `site_id` int DEFAULT NULL,
+  `provider` varchar(100) DEFAULT NULL,
+  `model` varchar(100) DEFAULT NULL,
+  `tokens_used` int UNSIGNED DEFAULT 0,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `ai_requests_site_date` (`site_id`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

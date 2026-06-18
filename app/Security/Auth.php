@@ -67,7 +67,8 @@ class Auth
 
     public static function siteId(): ?int
     {
-        return self::user()['site_id'] ?? null;
+        $siteId = self::user()['site_id'] ?? Config::get('app.current_site_id');
+        return $siteId !== null ? (int) $siteId : null;
     }
 
     public static function logout(): void

@@ -63,6 +63,12 @@ class App
             exit;
         }
 
+        foreach ($this->middleware as $middleware) {
+            if (!$middleware->handle()) {
+                return;
+            }
+        }
+
         // Dispatch request
         $this->router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'] ?? '/');
     }

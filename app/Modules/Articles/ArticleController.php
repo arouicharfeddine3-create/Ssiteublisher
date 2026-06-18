@@ -37,6 +37,12 @@ class ArticleController extends Controller
     public function edit(int $id): void
     {
         $article = Article::find($id);
+        if ($article === null) {
+            http_response_code(404);
+            $this->view('errors/404');
+            return;
+        }
+
         $this->view('articles/edit', ['article' => $article]);
     }
 
@@ -56,8 +62,8 @@ class ArticleController extends Controller
     public function generate(): void
     {
         // Trigger AI generation via queue
-        $topic = $this->request()['topic'];
-        $articleId = $this->service->createFromTopic($topic, Auth::siteId());
+        $data = $this->validate(['topic' => 'required']);
+        $articleId = $this->service->createFromTopic($data['topic'], Auth::siteId());
         // Dispatch job
         $dispatcher = new \App\Queue\JobDispatcher();
         $dispatcher->dispatch(\App\Queue\Jobs\GenerateArticleJob::class, ['article_id' => $articleId]);

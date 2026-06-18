@@ -108,6 +108,15 @@ class Migrations
                 content TEXT,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )",
+            "CREATE TABLE IF NOT EXISTS ai_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                site_id INTEGER DEFAULT NULL,
+                provider TEXT DEFAULT NULL,
+                model TEXT DEFAULT NULL,
+                tokens_used INTEGER DEFAULT 0,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )",
+            "CREATE INDEX IF NOT EXISTS ai_requests_site_date ON ai_requests (site_id, created_at)",
         ];
     }
 
